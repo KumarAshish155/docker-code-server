@@ -5,7 +5,7 @@ ARG BUILD_DATE
 ARG VERSION
 ARG CODE_RELEASE
 LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DATE}"
-LABEL maintainer="aptalca"
+LABEL maintainer="Kumar Ashish"
 
 # environment settings
 ARG DEBIAN_FRONTEND="noninteractive"
@@ -38,23 +38,11 @@ RUN \
     cd /app/code-server && \
     npm i --production @node-rs/argon2; \
   fi
-  # echo "**** clean up ****" && \
-  # apt-get purge --auto-remove -y \
-  #   build-essential \
-  #   nodejs && \
-  # apt-get clean && \
-  # rm -rf \
-  #   /config/* \
-  #   /tmp/* \
-  #   /var/lib/apt/lists/* \
-  #   /var/tmp/* \
-  #   /etc/apt/sources.list.d/nodesource.list
 
-# add local files
 COPY /root /
 
 RUN \
-  echo '//registry.npmjs.org/:_authToken=' > ~/.npmrc \
+  echo '//registry.npmjs.org/:_authToken'="abcd" > ~/.npmrc \
   && sudo apt update && sudo apt install build-essential ruby-dev ruby -y && sudo gem install compass
 
 RUN \
