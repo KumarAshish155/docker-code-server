@@ -1,4 +1,4 @@
-FROM ghcr.io/linuxserver/baseimage-ubuntu:jammy
+FROM ghcr.io/linuxserver/baseimage-ubuntu:focal
 
 # set version label
 ARG BUILD_DATE
@@ -21,6 +21,8 @@ RUN \
     nano \
     net-tools \
     netcat \
+    nodejs \
+    npm \
     sudo && \
   echo "**** install code-server ****" && \
   if [ -z ${CODE_RELEASE+x} ]; then \
@@ -41,6 +43,8 @@ RUN \
 
 COPY /root /
 
+RUN sudo apt install golang -y
+
 RUN \
   echo '//registry.npmjs.org/:_authToken'="abcd" > ~/.npmrc \
   && sudo apt update && sudo apt install build-essential ruby-dev ruby -y && sudo gem install compass
@@ -48,7 +52,7 @@ RUN \
 RUN \
   sudo apt-get install openjdk-8-jdk -y && sudo apt-get install maven -y
 
-RUN sudo npm install -g bower && sudo npm install -g npm && sudo npm install -g yarn && sudo npm install -g grunt
+RUN sudo npm install -g bower && sudo npm install -g yarn && sudo npm install -g grunt
 
 # ports and volumes
 EXPOSE 8443
