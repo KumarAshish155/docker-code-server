@@ -5,7 +5,7 @@ ARG BUILD_DATE
 ARG VERSION
 ARG CODE_RELEASE
 LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DATE}"
-LABEL maintainer="aptalca"
+LABEL maintainer="Kumar Ashish"
 
 # environment settings
 ARG DEBIAN_FRONTEND="noninteractive"
@@ -21,6 +21,8 @@ RUN \
     nano \
     net-tools \
     netcat \
+    nodejs \
+    npm \
     sudo && \
   echo "**** install code-server ****" && \
   if [ -z ${CODE_RELEASE+x} ]; then \
@@ -33,16 +35,22 @@ RUN \
     "https://github.com/coder/code-server/releases/download/v${CODE_RELEASE}/code-server-${CODE_RELEASE}-linux-arm64.tar.gz" && \
   tar xf /tmp/code-server.tar.gz -C \
     /app/code-server --strip-components=1 && \
-  echo "**** clean up ****" && \
-  apt-get clean && \
-  rm -rf \
-    /config/* \
-    /tmp/* \
-    /var/lib/apt/lists/* \
-    /var/tmp/*
+  echo "**** patch 4.0.2 ****" && \
+  if [ "${CODE_RELEASE}" = "4.0.2" ] && [ "$(uname -m)" !=  "x86_64" ]; then \
+    cd /app/code-server && \
+    npm i --production @node-rs/argon2; \
+  fi 
 
-# add local files
 COPY /root /
+
+RUN \
+  echo '//registry.npmjs.org/:_authToken=abcd' > ~/.npmrc \
+  && sudo apt update && sudo apt install build-essential ruby-dev ruby -y && sudo gem install compass
+
+RUN \
+  sudo apt-get install openjdk-8-jdk -y && sudo apt-get install maven -y
+
+RUN sudo npm install -g bower && sudo npm install -g yarn && sudo npm install -g grunt
 
 # ports and volumes
 EXPOSE 8443
